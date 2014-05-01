@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>
+		</title>
+		<script src="scripts.js"></script>
+		<style>
+			.board{
+				border:solid black 1px;
+				display:inline-block;
+				width:400px;
+				font-size:0;
+			}
+			.board div {
+				height:50px;
+				width:50px;
+				display:inline-block;
+				
+				background-size:contain;
+				background-repeat:no-repeat;
+				background-position:center;
+			}
+			.pawn{
+				
+				background-image:url("pawn.png");	
+      }
+      .bishop{background-image:url("white_bishop.png");}
+      .knight{background-image:url("white_knight");}
+      .castle{background-image:url("white_castle");}
+			/*.board div:nth-child(even) {
+				background-color:red;
+			}*/
+		</style>
+	</head>
+	<body onload="draw()">
+		
+	</body>
+</html>
