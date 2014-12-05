@@ -2,59 +2,62 @@ function draw(){
   // global variables
   var highlighted = [];
   var container = document.createElement("div");
-	var spaces = [];
-	var hl = false;
-	var oldLocation; // where the pawn is before we move it
-	var currentLocation; // where you clicked
+  var spaces = [];
+  var hl = false;
+  var oldLocation; // where the pawn is before we move it
+  var currentLocation; // where you clicked
+  //var row, column;
 
   // create an array of squares
   for(var row=0; row < 8; row++){ //rows
-	  spaces[row] = [];
-	  for( var column = 0; column < 8; column++){ // columns
-		  createDiv(row,column);
-		}
-	}
-
-    function createDiv(row,column){
-	  // Create our Divs
-		spaces[row][column] = document.createElement("div");
-		spaces[row][column].id = String.fromCharCode(row+65) + (column+1) // determine the id
-		container.appendChild(spaces[row][column]);
-	 					
-	  function BoardSetup(){
-     // set up classes
-     if (String.fromCharCode(row+65) == 'B') {spaces[row][column].className = "white_pawn";}
-     else if(String.fromCharCode(row+65) == 'G'){spaces[row][column].className = "black_pawn";} 
-     
-     if (String.fromCharCode(row+65) == 'H'){
-       if (column == 5 || column == 2){spaces[row][column].className = "black_bishop";}
-       else if (column == 1 || column == 6){spaces[row][column].className ="black_knight";}
-       else if (column == 0 || column == 7) {spaces[row][column].className = "black_castle";}
-       else if (column == 3){spaces[row][column].className = "black_queen";}
-       else if (column == 4){spaces[row][column].className = "black_king";}
-     }
-     else if(String.fromCharCode(row+65) == 'A'){
-       if (column == 5 || column == 2){ spaces[row][column].className = "white_bishop";}
-       else if (column == 1 || column == 6) {spaces[row][column].className="white_knight";}
-       else if (column == 0 || column == 7) {spaces[row][column].className = "white_castle";}
-       else if (column == 3){spaces[row][column].className = "white_queen";}
-       else if (column == 4) {spaces[row][column].className = "white_king";}
-     }
-     //currentLocation = oldLocation;
-	 }
-   BoardSetup();
+    spaces[row] = [];
+    for(var column = 0; column < 8; column++){ // columns
+      createDiv(row,column);
+    }
+   }
    
+   // determine each div's color and piece by original position
+   function createDiv(row,column){
+    // Create our Divs
+    spaces[row][column] = document.createElement("div");
+     spaces[row][column].id = String.fromCharCode(row+65) + (column+1) // determine the id
+    container.appendChild(spaces[row][column]);
+      
+     function position(row,column){
+       if(row == 1 || row == 6){return "pawn";}
+       else if (row == 0 || row == 7){
+        if (column == 0 || column == 7 ){return "castle";}
+        else if(column == 1 || column == 6){return "knight";}
+        else if (column == 2 || column == 5) {return "bishop";}
+        else if (column == 4){return "queen";}
+        else if (column == 3){return "king";}
+        else {return "WTF!";}
+       }
+     }  
+    
+     function color(row){
+       if (row === 0 || row === 1){return "white";}
+       else if (row === 6 || row === 7) {return "black";}
+       else {return "What Are You?!";}
+     }  
+    
+     //for the sake that the images in the divs are linked to the old classname
+     function character_class(position,color){
+    
+     }
+     spaces[row][column].className = position(row,column);
+     spaces[row][column].color = color(row);     
    // revert any highlighted spaces
 	 spaces[row][column].reverse = function(){
 		 spaces[row][column].style.backgroundColor = (column % 2) != (row % 2) ? "red": "white";
-   }
+   };
 				
 	 spaces[row][column].reverse(); // reset the board colors
 	 // when the user clicks a square
    spaces[row][column].onclick = function(){
 	   // onclick this is now our current location 
      currentLocation = spaces[row][column];
-		 console.log(currentLocation.className) 
+     
      function move(){
 		   for (var i = 0; i < highlighted.length; i++){
 			   if (currentLocation == highlighted[i]){
@@ -67,18 +70,16 @@ function draw(){
 		 }
 						
 		 function showAvailableMoves() {
-       console.log("enter show available spaces")
        while(highlighted.length){ // while length of highlighted > 0
 				 highlighted.pop().reverse(); // pop out all the old selected tiles
 			 }
        //highlighted.push(spaces[row-1][column]);
        switch(true){
-         case currentLocation.className == "black_pawn" || currentLocation.className == "white_pawn":
-           pawn_showAvailableSpaces(currentLocation.className);
-           // repopulates highlighted with pawnspecific spaces
+         case currentLocation.className == "pawn":
+           pawn_showAvailableSpaces(currentLocation.color);
            break;
-         case currentLocaiton.className == "black_castle" || currentLocation.className == "white_castle":
-           castle_showAvailableSpaces(currentLocation.className);
+         case currentLocation.className == "castle":
+           castle_showAvailableSpaces(currentLocation.color);
            break;
          case "black_bishop":
            break;
@@ -96,39 +97,38 @@ function draw(){
 		 }
       
      function pawn_showAvailableSpaces(color){
-       if (color == "black_pawn"){
+       if (color == "black"){
          if (row - 1 >= 0){ // check that square isn't off the edge of the board
            // we want to check all three possibilities
-           if (spaces[row-1][column].className == ""){
+           if (spaces[row-1][column].className == ""){// nothing in front of us so go
              highlighted.push(spaces[row-1][column]);
            }
            // if the spaces diagonal from the pawn are taken by a piece we can
            // move there and take it
            if (column - 1 >= 0){
-             if (spaces[row-1][column-1].className.indexOf("white") != -1){
+             if (spaces[row-1][column-1].color != color){
                highlighted.push(spaces[row-1][column-1]);
              }
            }
            if (column + 1 <= 7){
-             if (spaces[row-1][column+1].className.indexOf("white") != -1){
+             if (spaces[row-1][column+1].color != color){
                highlighted.push(spaces[row-1][column+1]);
              }
            }
          }
-           //call_draw.showAvailableSpaces(highlighted);
        }
-       else if (color == "white_pawn") {
+       else if (color == "white") {
          if(row + 1 <= 7){
            if (spaces[row+1][column].className == ""){
              highlighted.push(spaces[row+1][column]);
            }
            if(column - 1 >= 0){
-             if (spaces[row+1][column-1].className.indexOf("black") != -1){
+             if (spaces[row+1][column-1].color != color){
                highlighted.push(spaces[row+1][column-1]);
              }
            }
            if (column + 1 <= 7){
-             if (spaces[row+1][column+1].className.indexOf("black") != -1){
+             if (spaces[row+1][column+1].color != color){
                highlighted.push(spaces[row+1][column+1]);
              }
            }
@@ -139,47 +139,54 @@ function draw(){
      }
 
      function castle_showAvailableMoves(color){
-      if (color == "black_castle"){
-         if (row - 1 >= 0){ // check that square isn't off the edge of the board
-           // check for blockage to the north
-           for (n = row; n > 0; n--){
-             if (spaces[n][column].className == ""){
-               highlighted.push(spaces[n][column]);
-             }
+       // to the north
+       if (row - 1 >= 0){ // check that square isn't off the edge of the board
+         for (n = row; n > 0; n--){
+           //making sure that you can't go through your teammates
+           if (spaces[n][column].color != color){
+             highlighted.push(spaces[n][column]);
            }
-         }    
-           //call_draw.showAvailableSpaces(highlighted);
+           else {break;}
+         }
        }
-       else if (color == "white_castle") {
-         /*if(row + 1 <= 7){
-           if (spaces[row+1][column].className == ""){
-             highlighted.push(spaces[row+1][column]);
+       // to the south
+       if (row + 1 <= 7){
+         for (n = row; n < 7; n++){
+           if(spaces[n][column].color != color){
+             highlighted.push(spaces[n][column]);
            }
-           if (spaces[row+1][column-1].className.indexOf("black") != -1){
-             highlighted.push(spaces[row+1][column-1]);
+           else {break;}
+         }
+       }    
+       // to the west
+       if (column - 1 >= 0){
+         for (n = column; n > 0; n--){
+           if(spaces[row][n].color != color){
+             highlighted.push(spaces[row][n]);
            }
-           if (spaces[row+1][column+1].className.indexOf("black") != -1){
-             highlighted.push(spaces[row+1][column+1]);
+           else {break;}
+         }
+       }
+       // to the east
+       if (column + 1 <= 7){
+         for (n = column; n < 7; n++){
+           if(spaces[row][n].color != color){
+             highlighted.push(spaces[row][n]);
            }
-         }*/
+           else{break;}
+         }
        }
      }
 
 		 spaces[row][column].reverse(); // unhighlight squares
 		 //currentLocation = spaces[row][column];
-		 console.log("currentLocation = " + currentLocation.id);
-		 console.log("Clicked " + spaces[row][column].id); // log clicks
 		 if(hl) {move();}
 		 else{showAvailableMoves();}
 	
-	  }
-  }
+	  }// i have no idea what this goes to 
+   }// This is the end of OnClick
 
 	document.body.appendChild(container);
 	container.className = "board";
-}
+} //end of draw
     
-function rand(min,max){
-  return Math.floor(Math.random() * (max - min) + min);
-}
-
