@@ -18,11 +18,12 @@ function draw(){
    
    // determine each div's color and piece by original position
    function createDiv(row,column){
-    // Create our Divs
-    spaces[row][column] = document.createElement("div");
+     // Create our Divs
+     spaces[row][column] = document.createElement("div");
      spaces[row][column].id = String.fromCharCode(row+65) + (column+1) // determine the id
-    container.appendChild(spaces[row][column]);
+     container.appendChild(spaces[row][column]);
       
+     // determines the pieces class
      function position(row,column){
        if(row == 1 || row == 6){return "pawn";}
        else if (row == 0 || row == 7){
@@ -33,18 +34,20 @@ function draw(){
         else if (column == 3){return "king";}
         else {return "WTF!";}
        }
-     }  
+     } // end position  
     
+     // if the piece black or white?
      function color(row){
        if (row === 0 || row === 1){return "white";}
        else if (row === 6 || row === 7) {return "black";}
        else {return "What Are You?!";}
-     }  
+     } // end color 
     
      //for the sake that the images in the divs are linked to the old classname
      function character_class(position,color){
     
      }
+
      spaces[row][column].className = position(row,column);
      spaces[row][column].color = color(row);     
    // revert any highlighted spaces
