@@ -50,144 +50,147 @@ function draw(){
 
      spaces[row][column].className = position(row,column);
      spaces[row][column].color = color(row);     
-   // revert any highlighted spaces
-	 spaces[row][column].reverse = function(){
-		 spaces[row][column].style.backgroundColor = (column % 2) != (row % 2) ? "red": "white";
-   };
+    
+     // revert any highlighted spaces
+	   spaces[row][column].reverse = function(){
+		   spaces[row][column].style.backgroundColor = (column % 2) != (row % 2) ? "red": "white";
+     }; // end reverse function 
 				
-	 spaces[row][column].reverse(); // reset the board colors
-	 // when the user clicks a square
-   spaces[row][column].onclick = function(){
-	   // onclick this is now our current location 
-     currentLocation = spaces[row][column];
+	   spaces[row][column].reverse(); // reset the board colors
+	   
+     // when the user clicks a square
+     spaces[row][column].onclick = function(){
+	   
+       // onclick this is now our current location 
+       currentLocation = spaces[row][column];
      
-     function move(){
-		   for (var i = 0; i < highlighted.length; i++){
-			   if (currentLocation == highlighted[i]){
-				   currentLocation.className = oldLocation.className // pass along the piece's class
-           oldLocation.className = "";  // clear oldLocation's background-image
-		 		 }
-				 highlighted[i].reverse();
-			 }
-			 hl = false;
-		 }
+       function move(){
+		     for (var i = 0; i < highlighted.length; i++){
+			     if (currentLocation == highlighted[i]){
+				     currentLocation.className = oldLocation.className // pass along the piece's class
+             oldLocation.className = "";  // clear oldLocation's background-image
+		 		   }
+				   highlighted[i].reverse();
+			   }
+			   hl = false;
+		   } // end move()
 						
-		 function showAvailableMoves() {
-       while(highlighted.length){ // while length of highlighted > 0
-				 highlighted.pop().reverse(); // pop out all the old selected tiles
-			 }
-       //highlighted.push(spaces[row-1][column]);
-       switch(true){
-         case currentLocation.className == "pawn":
-           pawn_showAvailableSpaces(currentLocation.color);
-           break;
-         case currentLocation.className == "castle":
-           castle_showAvailableSpaces(currentLocation.color);
-           break;
-         case "black_bishop":
-           break;
-         case "black knght":
-           break;
-         case "black_queen":
-       }
-  		 for(var it = 0; it < highlighted.length; it ++){
-				 highlighted[it].style.backgroundColor = "yellow";
-			 }
-			 hl = true; // highlighted flag == true
-       // the square you clicked on is now the old location and the highlighted
-       // squares are now the possible new (current)locations
-       oldLocation = currentLocation;
-		 }
+		   function showAvailableMoves() {
+         while(highlighted.length){ // while length of highlighted > 0
+				   highlighted.pop().reverse(); // pop out all the old selected tiles
+			   }
+         //highlighted.push(spaces[row-1][column]);
+         switch(true){
+           case currentLocation.className == "pawn":
+             pawn_showAvailableSpaces(currentLocation.color);
+             break;
+           case currentLocation.className == "castle":
+             castle_showAvailableSpaces(currentLocation.color);
+             break;
+           case "black_bishop":
+             break;
+           case "black knght":
+             break;
+           case "black_queen":
+         }
+  		   for(var it = 0; it < highlighted.length; it ++){
+				   highlighted[it].style.backgroundColor = "yellow";
+			   }
+			   hl = true; // highlighted flag == true
+         // the square you clicked on is now the old location and the highlighted
+         // squares are now the possible new (current)locations
+         oldLocation = currentLocation;
+		   } // end showAvailableMoves()
       
-     function pawn_showAvailableSpaces(color){
-       if (color == "black"){
+       function pawn_showAvailableSpaces(color){
+         if (color == "black"){
+           if (row - 1 >= 0){ // check that square isn't off the edge of the board
+             // we want to check all three possibilities
+             if (spaces[row-1][column].className == ""){// nothing in front of us so go
+               highlighted.push(spaces[row-1][column]);
+             }
+             // if the spaces diagonal from the pawn are taken by a piece we can
+             // move there and take it
+             if (column - 1 >= 0){
+               if (spaces[row-1][column-1].color != color){
+                 highlighted.push(spaces[row-1][column-1]);
+               }
+             }
+             if (column + 1 <= 7){
+               if (spaces[row-1][column+1].color != color){
+                 highlighted.push(spaces[row-1][column+1]);
+               }
+             }
+           }
+         }
+         else if (color == "white") {
+           if(row + 1 <= 7){
+             if (spaces[row+1][column].className == ""){
+               highlighted.push(spaces[row+1][column]);
+             }
+             if(column - 1 >= 0){
+               if (spaces[row+1][column-1].color != color){
+                 highlighted.push(spaces[row+1][column-1]);
+               }
+             }
+             if (column + 1 <= 7){
+               if (spaces[row+1][column+1].color != color){
+                 highlighted.push(spaces[row+1][column+1]);
+               }
+             }
+           }
+         }
+         // otherwise this piece isn't correct and we don't want to move it
+         else {console.log("The color passed to pawn_show available spaces: " + color);}
+       } // end pawn_showAvailableSpaces
+
+       function castle_showAvailableMoves(color){
+         // to the north
          if (row - 1 >= 0){ // check that square isn't off the edge of the board
-           // we want to check all three possibilities
-           if (spaces[row-1][column].className == ""){// nothing in front of us so go
-             highlighted.push(spaces[row-1][column]);
-           }
-           // if the spaces diagonal from the pawn are taken by a piece we can
-           // move there and take it
-           if (column - 1 >= 0){
-             if (spaces[row-1][column-1].color != color){
-               highlighted.push(spaces[row-1][column-1]);
+           for (n = row; n > 0; n--){
+             //making sure that you can't go through your teammates
+             if (spaces[n][column].color != color){
+               highlighted.push(spaces[n][column]);
              }
-           }
-           if (column + 1 <= 7){
-             if (spaces[row-1][column+1].color != color){
-               highlighted.push(spaces[row-1][column+1]);
-             }
+             else {break;}
            }
          }
-       }
-       else if (color == "white") {
-         if(row + 1 <= 7){
-           if (spaces[row+1][column].className == ""){
-             highlighted.push(spaces[row+1][column]);
-           }
-           if(column - 1 >= 0){
-             if (spaces[row+1][column-1].color != color){
-               highlighted.push(spaces[row+1][column-1]);
+         // to the south
+         if (row + 1 <= 7){
+           for (n = row; n < 7; n++){
+             if(spaces[n][column].color != color){
+               highlighted.push(spaces[n][column]);
              }
+             else {break;}
            }
-           if (column + 1 <= 7){
-             if (spaces[row+1][column+1].color != color){
-               highlighted.push(spaces[row+1][column+1]);
+         }    
+         // to the west
+         if (column - 1 >= 0){
+           for (n = column; n > 0; n--){
+             if(spaces[row][n].color != color){
+               highlighted.push(spaces[row][n]);
              }
+             else {break;}
            }
          }
-       }
-       // otherwise this piece isn't correct and we don't want to move it
-       else {console.log("The color passed to pawn_show available spaces: " + color);}
-     }
+         // to the east
+         if (column + 1 <= 7){
+           for (n = column; n < 7; n++){
+             if(spaces[row][n].color != color){
+               highlighted.push(spaces[row][n]);
+             }
+             else{break;}
+           }
+         }
+       } // castle_showAvailableMoves()
 
-     function castle_showAvailableMoves(color){
-       // to the north
-       if (row - 1 >= 0){ // check that square isn't off the edge of the board
-         for (n = row; n > 0; n--){
-           //making sure that you can't go through your teammates
-           if (spaces[n][column].color != color){
-             highlighted.push(spaces[n][column]);
-           }
-           else {break;}
-         }
-       }
-       // to the south
-       if (row + 1 <= 7){
-         for (n = row; n < 7; n++){
-           if(spaces[n][column].color != color){
-             highlighted.push(spaces[n][column]);
-           }
-           else {break;}
-         }
-       }    
-       // to the west
-       if (column - 1 >= 0){
-         for (n = column; n > 0; n--){
-           if(spaces[row][n].color != color){
-             highlighted.push(spaces[row][n]);
-           }
-           else {break;}
-         }
-       }
-       // to the east
-       if (column + 1 <= 7){
-         for (n = column; n < 7; n++){
-           if(spaces[row][n].color != color){
-             highlighted.push(spaces[row][n]);
-           }
-           else{break;}
-         }
-       }
-     }
-
-		 spaces[row][column].reverse(); // unhighlight squares
-		 //currentLocation = spaces[row][column];
-		 if(hl) {move();}
-		 else{showAvailableMoves();}
+		   spaces[row][column].reverse(); // unhighlight squares
+		   //currentLocation = spaces[row][column];
+		   if(hl) {move();}
+		   else{showAvailableMoves();}
 	
-	  }// i have no idea what this goes to 
-   }// This is the end of OnClick
+	   }// end onclick() 
+   }// end CreateDiv
 
 	document.body.appendChild(container);
 	container.className = "board";
